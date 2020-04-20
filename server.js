@@ -86,6 +86,79 @@ server.delete('/:id', validatePost, (req, res) => {
         })
 })
 
+//Actions-----------------------
+
+//GET: '/:id/actions' 
+server.get('/:id/actions', validatePost, (req, res) => {
+    projectDb.getProjectActions(req.project)
+        .then(actions => {
+            res.status(200).json(actions)
+        })
+        .catch(() => {
+            res.status(500).json({ Error: 'Server error' })
+        })
+})
+
+//GET: '/actions/:id' 
+server.get('/actions/:id', validateAction, (req, res) => {
+    acttionDb.get(req.action)
+        .then(action => {
+            res.status(200).json(action)
+        })
+        .catch(() => {
+            res.status(500).json({ Error: 'Server error' })
+        })
+})
+
+//POST: '/:id/actions'
+server.post('/:id/actions', validatePost, (req, res) => {
+    const { description, notes } = req.body
+    req.body.project_id = req.project
+
+    !description || !notes
+        ?
+        res.status(400).json({ Error: `Description and notes are required fields` })
+        :
+        actionDb.insert(req.body)
+
+            .then(action => {
+                res.status(201).json(action)
+            })
+            .catch(error => {
+                res.status(500).json({ Error: 'Server error' })
+            })
+})
+
+//PUT: '/actions/:id'
+server.put('/actions/:id', validateAction, (req, res) => {
+    const { description, notes } = req.body;
+
+    !description || !notes
+        ?
+        res.status(400).json({ error: 'Description and notes required fields.' })
+        :
+        actionDb.update(req.action, req.body)
+
+            .then(action => {
+                res.status(200).json(action)
+            })
+            .catch(() => {
+                res.status(500).json({ Error: 'Server error' })
+            })
+})
+
+//DELETE: '/actions/:id'
+server.delete('/actions/:id', validateAction, (req, res) => {
+    actionDb.remove(req.action)
+        .then(num => {
+            res.status(200).json({ Success: `Project '${num}'sucessfully deleted!` })
+        })
+        .catch(() => {
+            res.status(500).json({ Error: 'Server error' })
+        })
+})
+
+
 
 
 //Middleware-----------------------
