@@ -12,3 +12,13 @@ I need this code, but don't know where, perhaps should make some middleware, don
 
 Go code!
 */
+const server = require('./server.js')
+
+const port = process.env.PORT || 8080
+server.listen(port, () => {
+    console.log(`\n=== Server listening on Port ${port} ===\n`)
+})
+
+server.get('/', (req, res) => {
+    res.send('<h1>Welcome to the Node API Challenge!</h1>')
+})
