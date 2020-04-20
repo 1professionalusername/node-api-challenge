@@ -1,13 +1,17 @@
 const express = require('express')
+const server = express()
+server.use(express.json())
 //.Router
 const projectDb = require('./data/helpers/projectModel')
 //const actionDb = require('./data/helpers/actionModel')
 
-const server = express()
-server.use(express.json())
 
-// const projects = require('./routes/projects')
-// const actions = require('./routes/actions')
+// const welcomeRouter = require("./welcome/welcome-router")
+// const hubsRouter = require("./hubs/hubs-router")
+
+// server.use("/", welcomeRouter)
+// server.use("/api/hubs", hubsRouter)
+
 
 
 
