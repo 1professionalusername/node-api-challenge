@@ -1,9 +1,19 @@
 const express = require('express')
 const server = express()
 server.use(express.json())
-//.Router
+//.Router 130
 const projectDb = require('./data/helpers/projectModel')
-//const actionDb = require('./data/helpers/actionModel')
+const actionDb = require('./data/helpers/actionModel')
+
+//This project needs work(obviously). 
+//Separate concerns into appropriate files/folders
+//Check in Insomnia every step of the way. 
+//Also, find out why nodemon would not auto refresh. Kept having to stop and restart the server.
+//.returning() is not supported by sqlite3 and will not have any effect. <------Investigate this console error
+
+
+
+
 
 
 // const welcomeRouter = require("./welcome/welcome-router")
@@ -16,8 +26,8 @@ const projectDb = require('./data/helpers/projectModel')
 
 
 
-// server.use('routes/projects', projects);
-// server.use('routes/actions', actions);
+// server.use('/routes/projects', projects);
+// server.use('/routes/actions', actions);
 
 //Projects-----------------------
 
@@ -34,9 +44,9 @@ server.get('/projects', (req, res) => {
 
 
 //POST: '/projects' 
-server.post('/', (req, res) => {
+server.post('/projects', (req, res) => {
 
-    //turnary replaces if statement to save space ? :
+    //turnary replaces if statement to save space (condition ? exprIfTrue : exprIfFalse)
     !req.body
         ?
         res.status(400).json({ Error: 'Name and description required fields' })
@@ -53,8 +63,8 @@ server.post('/', (req, res) => {
 })
 
 //Get: '/projects/:id
-server.get('/:id', validatePost, (req, res) => {
-    projectDB.get(req.params.id).then(project => {
+server.get('/projects/:id', validatePost, (req, res) => {
+    projectDb.get(req.params.id).then(project => {
         res.status(200).json(project)
     }).catch(error =>
         res.status(500).json({ error: `Server error` })
@@ -63,7 +73,7 @@ server.get('/:id', validatePost, (req, res) => {
 
 
 //PUT: '/projects/:id'
-server.put('/:id', validatePost, (req, res) => {
+server.put('/projects/:id', validatePost, (req, res) => {
 
     !req.body
         ?
@@ -80,10 +90,11 @@ server.put('/:id', validatePost, (req, res) => {
 })
 
 //DELETE: '/projects/:id' 
-server.delete('/:id', validatePost, (req, res) => {
+server.delete('/projects/:id', validatePost, (req, res) => {
     projectDb.remove(req.project)
         .then(number => {
-            res.status(200).json({ Success: `Project '${number}'successfully deleted` })
+            console.log(number)
+            res.status(200).json({ Success: `Project successfully deleted` })
         })
         .catch(() => {
             res.status(500).json({ Error: 'Server error' })
@@ -92,8 +103,8 @@ server.delete('/:id', validatePost, (req, res) => {
 
 //Actions-----------------------
 
-//GET: '/:id/actions' 
-server.get('/:id/actions', validatePost, (req, res) => {
+//GET: '/projects/:id/actions' 
+server.get('/projects/:id/actions', validatePost, (req, res) => {
     projectDb.getProjectActions(req.project)
         .then(actions => {
             res.status(200).json(actions)
@@ -105,7 +116,7 @@ server.get('/:id/actions', validatePost, (req, res) => {
 
 //GET: '/actions/:id' 
 server.get('/actions/:id', validateAction, (req, res) => {
-    acttionDb.get(req.action)
+    actionDb.get(req.action)
         .then(action => {
             res.status(200).json(action)
         })
@@ -114,12 +125,11 @@ server.get('/actions/:id', validateAction, (req, res) => {
         })
 })
 
-//POST: '/:id/actions'
-server.post('/:id/actions', validatePost, (req, res) => {
-    const { description, notes } = req.body
+//POST: '/projects/:id/actions'
+server.post('/projects/:id/actions', validatePost, (req, res) => {
     req.body.project_id = req.project
 
-    !description || !notes
+    !req.body
         ?
         res.status(400).json({ Error: `Description and notes are required fields` })
         :
@@ -135,9 +145,8 @@ server.post('/:id/actions', validatePost, (req, res) => {
 
 //PUT: '/actions/:id'
 server.put('/actions/:id', validateAction, (req, res) => {
-    const { description, notes } = req.body;
 
-    !description || !notes
+    !req.body
         ?
         res.status(400).json({ error: 'Description and notes required fields.' })
         :
@@ -155,7 +164,8 @@ server.put('/actions/:id', validateAction, (req, res) => {
 server.delete('/actions/:id', validateAction, (req, res) => {
     actionDb.remove(req.action)
         .then(num => {
-            res.status(200).json({ Success: `Project '${num}'sucessfully deleted!` })
+            console.log(num)
+            res.status(200).json({ Success: `Project sucessfully deleted!` })
         })
         .catch(() => {
             res.status(500).json({ Error: 'Server error' })
